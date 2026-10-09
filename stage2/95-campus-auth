@@ -1,0 +1,15 @@
+#!/bin/ash
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+[ "$INTERFACE" = wan ] || exit 0
+case "$ACTION" in
+    ifup|ifupdate)
+        [ "$(uci -q get campus-auth.main.enabled 2>/dev/null)" = 1 ] ||
+            [ "$(uci -q get campus-auth.main.bootstrap_pending 2>/dev/null)" = 1 ] || exit 0
+        (
+            sleep 15
+            /usr/bin/campus-auth auto >/dev/null 2>&1
+        ) >/dev/null 2>&1 &
+        ;;
+esac
+exit 0
